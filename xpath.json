@@ -1,0 +1,4 @@
+xpaths:{
+    "HomePage_Element_Xpath": "//h5[text()='Elements']",
+    "HomePage_SeleniumTrainingLink_Xpath": "//img[@alt='Selenium Online Training']"
+}
