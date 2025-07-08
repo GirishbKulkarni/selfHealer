@@ -1,0 +1,12 @@
+{
+  "//div[contains(@class, 'card')][.//h5[text()='Element']]": {
+    "logical_name": "HomePage_Element_Xpath",
+    "old_xpath": "//h5[text()='Elements']",
+    "status": "HEALED"
+  },
+  "//a[@href='https://www.toolsqa.com/selenium-training/']": {
+    "logical_name": "HomePage_SeleniumTrainingLink_Xpath",
+    "old_xpath": "//img[@alt='Selenium Online Training']",
+    "status": "HEALED"
+  }
+}

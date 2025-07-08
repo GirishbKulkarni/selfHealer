@@ -1,0 +1,56 @@
+[
+  {
+    "element_type": "link",
+    "description": "Close Ad button in the bottom banner",
+    "xpath": "//a[@id='close-fixedban']",
+    "strategy_used": "id"
+  },
+  {
+    "element_type": "link",
+    "description": "Header logo link to home",
+    "xpath": "//header/a[@href='https://demoqa.com/']",
+    "strategy_used": "href"
+  },
+  {
+    "element_type": "link",
+    "description": "Selenium Training banner link",
+    "xpath": "//a[@href='https://www.toolsqa.com/selenium-training/']",
+    "strategy_used": "href"
+  },
+  {
+    "element_type": "div",
+    "description": "Element category card",
+    "xpath": "//div[contains(@class, 'card')][.//h5[text()='Element']]",
+    "strategy_used": "text()"
+  },
+  {
+    "element_type": "div",
+    "description": "Forms category card",
+    "xpath": "//div[contains(@class, 'card')][.//h5[text()='Forms']]",
+    "strategy_used": "text()"
+  },
+  {
+    "element_type": "div",
+    "description": "Alerts, Frame & Windows category card",
+    "xpath": "//div[contains(@class, 'card')][.//h5[text()='Alerts, Frame & Windows']]",
+    "strategy_used": "text()"
+  },
+  {
+    "element_type": "div",
+    "description": "Widgets category card",
+    "xpath": "//div[contains(@class, 'card')][.//h5[text()='Widgets']]",
+    "strategy_used": "text()"
+  },
+  {
+    "element_type": "div",
+    "description": "Interactions category card",
+    "xpath": "//div[contains(@class, 'card')][.//h5[text()='Interactions']]",
+    "strategy_used": "text()"
+  },
+  {
+    "element_type": "div",
+    "description": "Book Store Application category card",
+    "xpath": "//div[contains(@class, 'card')][.//h5[text()='Book Store Application']]",
+    "strategy_used": "text()"
+  }
+]

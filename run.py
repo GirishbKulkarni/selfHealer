@@ -1,52 +1,82 @@
-from agents.uiObserver import ElementExtractor, selfHealer
 import json
 import os
 
-INPUT_DIR = "inpurData"
-OUTPUT_DIR = "output"
+# Import the agent classes from the core module
+# This single import works regardless of whether agents.py uses LangChain or not.
+from agents.agent_core import ExtractorAgent, HealerAgent
 
-locator_store_file = os.path.join(INPUT_DIR, "locator_store.json")
-updatedDOMFile = os.path.join(INPUT_DIR, "htmlPages/DEMOQA.html")
-
-healedStoreFile = os.path.join(OUTPUT_DIR, "healed_locator_store.json")
-intermediateStoreFile = os.path.join(OUTPUT_DIR, "intermediate_locator_store.json")
+# --- Configuration ---
+# Define paths relative to the script's location for robustness.
+INPUT_DIR = "input_data"
+OUTPUT_DIR = "output_data"
+LOCATOR_STORE_FILE = os.path.join(INPUT_DIR, "locator_store.json")
+UPDATED_DOM_FILE = os.path.join(INPUT_DIR, "DEMOQA.html")
+HEALED_STORE_FILE = os.path.join(OUTPUT_DIR, "locator_store_healed.json")
+INTERMEDIATE_FILE = os.path.join(OUTPUT_DIR, "extracted_elements.json")
 
 def main():
+    """
+    Orchestrates the two-agent workflow for proactive healing.
+    """
+    print("--- Starting Proactive Multi-Agent Healing Process ---")
+    
+    # Ensure the output directory exists
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    try: 
-        with open(locator_store_file, "r", encoding="utf-8") as f:
-            oldlocator_store = json.load(f)
-            print("Old json is successfully loaded")
-        with open(updatedDOMFile, "r", encoding="utf-8") as f:
-            updated_dom = f.read()
-            print("Updated DOM is successfully loaded")
+    # 1. Load initial input files from disk
+    try:
+        print(f"Reading old locators from: {LOCATOR_STORE_FILE}")
+        with open(LOCATOR_STORE_FILE, 'r', encoding='utf-8') as f:
+            old_locator_data = json.load(f)
 
-    except Exception as e:
-        print(f"Error loading the files: {e}")
-        return []
-    
-    element_extractor = ElementExtractor()
-    extracted_elements = element_extractor.run(updated_dom)
+        print(f"Reading updated DOM from: {UPDATED_DOM_FILE}")
+        with open(UPDATED_DOM_FILE, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+            
+    except FileNotFoundError as e:
+        print(f"\nERROR: Input file not found - {e}. Please ensure it exists in the 'input_data' directory.")
+        print("Halting process.")
+        return
+    except json.JSONDecodeError as e:
+        print(f"\nERROR: Could not parse {LOCATOR_STORE_FILE}. It is not valid JSON - {e}.")
+        print("Halting process.")
+        return
+
+    # ==========================================================================
+    #  STEP 1: Invoke Agent 1 (Extractor)
+    # ==========================================================================
+    print("\n>>> Invoking Agent 1: Extractor Agent <<<")
+    extractor_agent = ExtractorAgent()
+    extracted_elements = extractor_agent.run(html_content)
+
     if not extracted_elements:
-        print("No elements were extracted from the updated DOM.")
-        return []
+        print("\nExtractor Agent failed to produce results. Halting process.")
+        return
 
-    with open(intermediateStoreFile, "w", encoding="utf-8") as f:
+    # Save the intermediate output from Agent 1 for debugging and transparency
+    with open(INTERMEDIATE_FILE, 'w', encoding='utf-8') as f:
         json.dump(extracted_elements, f, indent=2)
-    
-    print("Intermediate locator store is successfully saved.")
+    print(f"  [Orchestrator] Saved intermediate results to: {INTERMEDIATE_FILE}")
 
+    # ==========================================================================
+    #  STEP 2: Invoke Agent 2 (Healer/Mapper)
+    # ==========================================================================
+    print("\n>>> Invoking Agent 2: Healer & Mapper Agent <<<")
+    healer_agent = HealerAgent()
+    healed_store = healer_agent.run(old_locator_data, extracted_elements)
 
-    self_healer = selfHealer()
-    healed_locator_data = self_healer.run(oldlocator_store, extracted_elements)
-    if not healed_locator_data:
-        print("No healed locator data was generated.")
-        return []
-    
-    with open(healedStoreFile, "w", encoding="utf-8") as f:
-        json.dump(healed_locator_data, f, indent=2)
-        print("Healed locator store is successfully saved.")
+    if not healed_store:
+        print("\nHealer Agent failed to produce results. Halting process.")
+        return
+
+    # ==========================================================================
+    #  STEP 3: Save Final Output
+    # ==========================================================================
+    with open(HEALED_STORE_FILE, 'w', encoding='utf-8') as f:
+        json.dump(healed_store, f, indent=2)
+
+    print("\n--- Multi-Agent Healing Process Complete ---")
+    print(f"Final healed locator store has been successfully saved to: {HEALED_STORE_FILE}")
 
 if __name__ == "__main__":
     main()
